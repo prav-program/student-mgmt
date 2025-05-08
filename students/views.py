@@ -4,6 +4,7 @@ from .forms import StudentForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib import messages
 
 @login_required
 def student_list(request):
@@ -22,6 +23,7 @@ def student_create(request):
     form = StudentForm(request.POST or None)
     if form.is_valid():
         form.save()
+        messages.success(request, 'Student added successfully.')
         return redirect('student_list')
     return render(request, 'students/student_form.html', {'form': form})
 
@@ -31,6 +33,7 @@ def student_update(request, pk):
     form = StudentForm(request.POST or None, instance=student)
     if form.is_valid():
         form.save()
+        messages.success(request, 'Student updated successfully.')
         return redirect('student_list')
     return render(request, 'students/student_form.html', {'form': form})
 
@@ -39,4 +42,5 @@ def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
     student.is_deleted = True
     student.save()
+    messages.success(request, 'Student deleted successfully.')
     return redirect('student_list')

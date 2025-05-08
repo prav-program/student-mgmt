@@ -1,17 +1,70 @@
-{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
   <title>Student List</title>
-  <link rel="stylesheet" href="{% static 'https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <style>
+    .center-link {
+      text-align: center;
+      margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
+  {% if messages %}
+  <div id="message-container">
+    {% for message in messages %}
+      <div class="alert">
+        <strong>{{ message }}</strong>
+      </div>
+    {% endfor %}
+  </div>
+
+  <style>
+    #message-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .alert {
+      color: white;
+      background-color: #28a745;
+      padding: 12px 20px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-weight: bold;
+      text-align: center;
+      min-width: 300px;
+    }
+  </style>
+  <script>
+    setTimeout(function () {
+      var msg = document.getElementById('message-container');
+      if (msg) msg.style.display = 'none';
+    }, 2000);
+  </script>
+{% endif %}
+
   <h2>Students</h2>
-  <form method="get">
-    <input type="text" name="q" placeholder="Search..." value="{{ query }}">
-    <button type="submit">Search</button>
+
+  {% if not user.is_authenticated %}
+  <a href="{% url 'login' %}">
+    <button type="button">Login</button>
+  </a>
+{% endif %}
+
+{% if user.is_authenticated %}
+  <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="position: fixed; top: 20px; right: 20px;">Logout</button>
   </form>
-  <a href="{% url 'student_add' %}">Add Student</a>
+{% endif %}
+
+  <div class="center-link">
+    <a href="{% url 'student_add' %}">Add Student</a>
+  </div>
+
   <table id="studentTable">
     <thead>
       <tr><th>Name</th><th>Class</th><th>Date</th><th>Actions</th></tr>
@@ -33,6 +86,7 @@
 
   <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  
   <script>
     $(document).ready(function () {
         $('#studentTable').DataTable();
